@@ -125,7 +125,9 @@ class ClickButton extends React.Component {
     this.press = this.press.bind(this);
   }
 
-  press() {
+  press(e) {
+    console.log(e);
+
     let className = (this.state.class === "off")? "on" : "off";
     this.setState({class: className});
   }
@@ -135,12 +137,103 @@ class ClickButton extends React.Component {
   }
 }
 
+class Clock extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {date: new Date(), name: "Дима"};
+  }
+
+  componentDidMount() {
+    this.timerId = setInterval(() => this.tick(), 1000);
+  }
+
+  componentWillUnmount() {
+    clearInterval(this.timerId);
+  }
+
+  tick() {
+    this.setState({
+      date: new Date()
+    });
+  }
+
+  render() {
+    return (
+      <div>
+        <h1>Привет, {this.state.name}</h1>
+        <h2>Текущее время: {this.state.date.toLocaleTimeString()}</h2>
+      </div>
+    );
+  }
+}
+
+const propsValues = {
+    title: "Список смартфонов",
+    items: [
+        "HTC U Ultra", 
+        "iPhone 7", 
+        "Google Pixel", 
+        "Huawei P9", 
+        "Meizu Pro 6", 
+        "Asus Zenfone 3"
+    ]
+};
+
+class Item extends React.Component {
+  render() {
+    return <li>{this.props.name}</li>
+  }
+}
+
+class ItemsList extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {items: this.props.data.items};
+
+    this.filterList = this.filterList.bind(this);
+  }
+
+  //фильтр
+  filterList(e) {
+    var filteredList = this.props.data.items.filter(function(item){
+      return item.toLowerCase().search(e.target.value.toLowerCase())!== -1;
+    })
+    //обновление состояния
+    this.setState({items: filteredList});
+  }
+
+  render() {
+    return (
+      <div>
+        <h2>{this.props.title}</h2>
+        <input placeholder="Поиск" onChange={this.filterList} />
+        <ul>
+          {
+            this.state.items.map(function(item){
+              return <Item key={item} name={item} />
+            })
+          }
+        </ul>
+      </div>
+    );
+  }
+}
+
+
 // ========================================
 
 ReactDOM.render(
   <Game />, document.getElementById('root')
-);
+)
 
 ReactDOM.render(
   <ClickButton />, document.getElementById('app')
-);
+)
+
+ReactDOM.render(
+  <Clock />, document.getElementById('clock')
+)
+
+ReactDOM.render(
+  <ItemsList data={propsValues} />, document.getElementById('phones')
+)
